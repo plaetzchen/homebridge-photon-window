@@ -7,10 +7,10 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   DoorState = homebridge.hap.Characteristic.CurrentDoorState;
 
-  homebridge.registerAccessory("homebridge-photon-garagedoor", "PhotonGarageDoor", PhotonGarageDoor);
+  homebridge.registerAccessory("homebridge-photon-window", "PhotonWindow", PhotonWindow);
 }
 
-function PhotonGarageDoor(log, config) {
+function PhotonWindow(log, config) {
   this.log = log;
   this.name = config["name"];
   this.accessToken = config["access_token"];
@@ -27,16 +27,16 @@ function PhotonGarageDoor(log, config) {
   this.initService();
 }
 
-PhotonGarageDoor.prototype = {
+PhotonWindow.prototype = {
 
   initService: function() {
-    this.garageDoorOpener = new Service.GarageDoorOpener(this.name,this.name);
+    this.window = new Service.Window(this.name,this.name);
 
-    this.currentDoorState = this.garageDoorOpener.getCharacteristic(DoorState);
+    this.currentPosition = this.window.getCharacteristic(CurrentPosition);
 
-    this.targetDoorState = this.garageDoorOpener.getCharacteristic(Characteristic.TargetDoorState);
-    this.targetDoorState.on('set', this.setState.bind(this));
-    this.targetDoorState.on('get', this.getTargetState.bind(this));
+    this.targetPosition = this.window.getCharacteristic(Characteristic.TargetPosition);
+    this.targetPosition.on('set', this.setState.bind(this));
+    this.targetPosition.on('get', this.getTargetState.bind(this));
 
     this.operating = false;
 
@@ -54,7 +54,7 @@ PhotonGarageDoor.prototype = {
     this.infoService = new Service.AccessoryInformation();
     this.infoService
       .setCharacteristic(Characteristic.Manufacturer, "Opensource Community")
-      .setCharacteristic(Characteristic.Model, "Particle Photon GarageDoor")
+      .setCharacteristic(Characteristic.Model, "Particle Photon Window")
       .setCharacteristic(Characteristic.SerialNumber, "Version 1.0.0");
 
     this.fetchCurrentState();
